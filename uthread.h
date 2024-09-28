@@ -9,48 +9,49 @@ typedef CRITICAL_SECTION   ut_mutex_t;
 typedef CONDITION_VARIABLE ut_cond_t;
 
 #define ut_thread_create(thread, routine, arg) \
-  (thread = CreateThread(0, 0, routine, 0, 0, NULL))
+  thread = CreateThread(0, 0, routine, 0, 0, NULL)
 
 #define ut_thread_kill(thread) \
-  (TerminateThread(hthread, 0))
+  TerminateThread(hthread, 0)
 
 #define ut_thread_wait(thread) \
-  (WaitForSingleObject(thread, INFINITE))
+  WaitForSingleObject(thread, INFINITE)
 
 #define ut_thread_exit(void) \
-  (ExitThread(0))
+  ExitThread(0)
 
 #define ut_mutex_create(mutex) \
-  (InitializeCriticalSection(mutex))
+  InitializeCriticalSection(mutex)
 
 #define ut_mutex_destroy(mutex) \
-  (DeleteCriticalSection(mutex))
+  DeleteCriticalSection(mutex)
 
 #define ut_mutex_lock(mutex) \
-  EnterCriticalSection(mutex))
+  EnterCriticalSection(mutex)
 
 #define ut_mutex_trylock(mutex) \
-  #warning "ut_mutex_trylock() not implemented"
+  TryEnterCriticalSection(mutex)
 
 #define ut_mutex_unlock(mutex) \
-  (LeaveCriticalSection(mutex))
+  LeaveCriticalSection(mutex)
 
 #define ut_cond_create(cond) \
-  (InitializeConditionVariable(cond))
+  InitializeConditionVariable(cond)
 
 #define ut_cond_destroy(cond) \
-  ((void)(cond))
+  (void)(cond)
 
 #define ut_cond_signal(cond) \
-  (WakeConditionVariable(cond))
+  WakeConditionVariable(cond)
 
 #define ut_cond_broadcast(cond) \
-  (WakeAllConditionVariable(cond))
+  WakeAllConditionVariable(cond)
 
 #define ut_cond_wait(cond, mutex) \
-  (SleepConditionVariableCS(cond, mutex, INFINITE))
+  SleepConditionVariableCS(cond, mutex, INFINITE)
 
-#define ut_sleep(int ms)
+#define ut_sleep(int ms) \
+  Sleep(ms)
 
 #else
 #include <unistd.h>
@@ -72,7 +73,7 @@ typedef pthread_cond_t  ut_cond_t;
   (pthread_join(thread, NULL) == 0)
 
 #define ut_thread_exit(void) \
-  pthread_exit(NULL))
+  (pthread_exit(NULL))
 
 #define ut_mutex_create(mutex) \
   (pthread_mutex_init(mutex, 0) == 0)
@@ -99,7 +100,7 @@ typedef pthread_cond_t  ut_cond_t;
   (pthread_cond_signal(cond) == 0)
 
 #define ut_cond_broadcast(cond) \
-  (pthread_cond_broadcast(cond) == 0))
+  (pthread_cond_broadcast(cond) == 0)
 
 #define ut_cond_wait(cond, mutex) \
   (pthread_cond_wait(cond, mutex) == 0)
@@ -107,4 +108,3 @@ typedef pthread_cond_t  ut_cond_t;
 #define ut_sleep(ms) \
   (usleep(ms * 1000) == 0)
 #endif
-
