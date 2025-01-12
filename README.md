@@ -1,2 +1,1 @@
-# uthread
-Universal threading C library.
+This repository provides a single header file containing cross-platform macros to simplify the use of threads in C. The macros abstract platform-specific threading APIs, ensuring compatibility across various systems (e.g., POSIX, Windows).
