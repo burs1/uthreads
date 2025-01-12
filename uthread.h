@@ -1,110 +1,116 @@
+/**
+ * @file uthread.h
+ * @brief Cross-platform thread macros.
+ */
 #pragma once
 #ifdef _WIN32
 #include <windows.h>
 
-#define UT_ROUTINE_RETURN_TYPE void
+#define ROUTINE_RETURN_TYPE void
+#define ROUTINE_RETURN return
 
-typedef HANDLE             ut_thread_t;
-typedef CRITICAL_SECTION   ut_mutex_t;
-typedef CONDITION_VARIABLE ut_cond_t;
+typedef HANDLE             thread;
+typedef CRITICAL_SECTION   mutex;
+typedef CONDITION_VARIABLE cond;
 
-#define ut_thread_create(thread, routine, arg) \
-  thread = CreateThread(0, 0, routine, 0, 0, NULL)
+#define create_thread(thread, routine, arg) \
+  (thread = CreateThread(0, 0, routine, 0, 0, NULL))
 
-#define ut_thread_kill(thread) \
-  TerminateThread(hthread, 0)
+#define kill_thread(thread) \
+  (TerminateThread(hthread, 0))
 
-#define ut_thread_wait(thread) \
-  WaitForSingleObject(thread, INFINITE)
+#define wait_thread(thread) \
+  (WaitForSingleObject(thread, INFINITE))
 
-#define ut_thread_exit(void) \
-  ExitThread(0)
+#define exit_thread(void) \
+  (ExitThread(0))
 
-#define ut_mutex_create(mutex) \
-  InitializeCriticalSection(mutex)
+#define create_mutex(mutex) \
+  (InitializeCriticalSection(mutex))
 
-#define ut_mutex_destroy(mutex) \
-  DeleteCriticalSection(mutex)
+#define destroy_mutex(mutex) \
+  (DeleteCriticalSection(mutex))
 
-#define ut_mutex_lock(mutex) \
-  EnterCriticalSection(mutex)
+#define lock_mutex(mutex) \
+  (EnterCriticalSection(mutex))
 
-#define ut_mutex_trylock(mutex) \
-  TryEnterCriticalSection(mutex)
+#define try_lock_mutex(mutex) \
+  (TryEnterCriticalSection(mutex))
 
-#define ut_mutex_unlock(mutex) \
-  LeaveCriticalSection(mutex)
+#define unlock_mutex(mutex) \
+  (LeaveCriticalSection(mutex))
 
-#define ut_cond_create(cond) \
-  InitializeConditionVariable(cond)
+#define create_cond(cond) \
+  (InitializeConditionVariable(cond))
 
-#define ut_cond_destroy(cond) \
-  (void)(cond)
+#define destroy_cond(cond) \
+  ((void)(cond))
 
-#define ut_cond_signal(cond) \
-  WakeConditionVariable(cond)
+#define signal_cond(cond) \
+  (WakeConditionVariable(cond))
 
-#define ut_cond_broadcast(cond) \
-  WakeAllConditionVariable(cond)
+#define broadcast_cond(cond) \
+  (WakeAllConditionVariable(cond))
 
-#define ut_cond_wait(cond, mutex) \
-  SleepConditionVariableCS(cond, mutex, INFINITE)
+#define wait_cond(cond, mutex) \
+  (SleepConditionVariableCS(cond, mutex, INFINITE))
 
-#define ut_sleep(int ms) \
-  Sleep(ms)
+#define sleep_for_ms(int ms) \
+  (Sleep(ms))
 
 #else
 #include <unistd.h>
 #include <pthread.h>
 
-#define UT_ROUTINE_RETURN_TYPE void*
+#define ROUTINE_RETURN_TYPE void*
+#define ROUTINE_RETURN return NULL
 
-typedef pthread_t       ut_thread_t;
-typedef pthread_mutex_t ut_mutex_t;
-typedef pthread_cond_t  ut_cond_t;
+typedef pthread_t       thread;
+typedef pthread_mutex_t mutex;
+typedef pthread_cond_t  cond;
 
-#define ut_thread_create(thread, routine, arg) \
-  (pthread_create(thread, 0, routine, arg) == 0)
+#define create_thread(thread, routine, arg) \
+  (pthread_create(thread, 0, routine, arg))
 
-#define ut_thread_kill(thread) \
-  (pthread_kill(thread, 0) == 0)
+#define kill_thread(thread) \
+  (pthread_kill(thread, 0))
 
-#define ut_thread_wait(thread) \
-  (pthread_join(thread, NULL) == 0)
+#define wait_thread(thread) \
+  (pthread_join(thread, NULL))
 
-#define ut_thread_exit(void) \
+#define exit_thread(void) \
   (pthread_exit(NULL))
 
-#define ut_mutex_create(mutex) \
-  (pthread_mutex_init(mutex, 0) == 0)
+#define create_mutex(mutex) \
+  (pthread_mutex_init(mutex, 0))
 
-#define ut_mutex_destroy(mutex) \
-  (pthread_mutex_destroy(mutex) == 0)
+#define destroy_mutex(mutex) \
+  (pthread_mutex_destroy(mutex))
 
-#define ut_mutex_lock(mutex) \
-  (pthread_mutex_lock(mutex) == 0)
+#define lock_mutex(mutex) \
+  (pthread_mutex_lock(mutex))
 
-#define ut_mutex_trylock(mutex) \
-  (pthread_mutex_trylock(mutex) == 0)
+#define try_lock_mutex(mutex) \
+  (pthread_mutex_trylock(mutex))
 
-#define ut_mutex_unlock(mutex) \
-  (pthread_mutex_unlock(mutex) == 0)
+#define unlock_mutex(mutex) \
+  (pthread_mutex_unlock(mutex))
 
-#define ut_cond_create(cond) \
-  (pthread_cond_init(cond, 0) == 0)
+#define create_cond(cond) \
+  (pthread_cond_init(cond, 0))
 
-#define ut_cond_destroy(cond) \
-  (pthread_cond_destroy(cond) == 0)
+#define destroy_cond(cond) \
+  (pthread_cond_destroy(cond))
 
-#define ut_cond_signal(cond) \
-  (pthread_cond_signal(cond) == 0)
+#define signal_cond(cond) \
+  (pthread_cond_signal(cond))
 
-#define ut_cond_broadcast(cond) \
-  (pthread_cond_broadcast(cond) == 0)
+#define broadcast_cond(cond) \
+  (pthread_cond_broadcast(cond))
 
-#define ut_cond_wait(cond, mutex) \
-  (pthread_cond_wait(cond, mutex) == 0)
+#define wait_cond(cond, mutex) \
+  (pthread_cond_wait(cond, mutex))
 
-#define ut_sleep(ms) \
-  (usleep(ms * 1000) == 0)
+#define sleep_for_ms(ms) \
+  (usleep_ms(ms * 1000))
 #endif
